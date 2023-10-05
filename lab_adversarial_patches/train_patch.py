@@ -2,8 +2,10 @@
 import os
 import numpy as np
 import argparse
+import zipfile
 
 # ----- Third Party Imports
+import gdown
 import torch as tr
 from torchvision import transforms, datasets
 
@@ -20,6 +22,11 @@ def main():
                         choices = ['book','cellphone','mouse','pencilcase','ringbinder'],
                         help = 'Target class for the adversarial attack')
     args = parser.parse_args()
+
+    # download data.zip which contains models weights
+    gdown.download(id='1S5l8Bn_oTckD5iiMSX82m9pxJp0762Qc')
+    with zipfile.ZipFile('data.zip', 'r') as zip_ref:
+        zip_ref.extractall('')
 
     target_class = [args.target_class]
     if target_class[0] is None:

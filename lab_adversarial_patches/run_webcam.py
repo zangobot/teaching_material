@@ -2,11 +2,13 @@
 import numpy as np
 from PIL import Image
 import os
+import zipfile
 
 # ----- Third Party Imports
 import cv2
 import torch as tr
 from torchvision import transforms
+import gdown
 
 # ----- Library Imports
 from utils import MyRandomAffine
@@ -71,6 +73,11 @@ def webcam_inference(model, numpy_patch):
     cv2.destroyAllWindows()
 
 def main():
+    # download data.zip which contains models weights and adversarial patches
+    gdown.download(id='1S5l8Bn_oTckD5iiMSX82m9pxJp0762Qc')
+    with zipfile.ZipFile('data.zip', 'r') as zip_ref:
+        zip_ref.extractall('')
+
     # load trained model
     model_wrp = TorchModelWrapper(model_name='alexnet', num_classes=5) # HARD-CODED
     model_wrp.load_model(os.path.join('data','models'))
