@@ -1,4 +1,6 @@
 # ----- Standard Imports
+from pathlib import Path
+
 import numpy as np
 from PIL import Image
 import os
@@ -74,7 +76,9 @@ def webcam_inference(model, numpy_patch):
 
 def main():
     # download data.zip which contains models weights and adversarial patches
-    gdown.download(id='1S5l8Bn_oTckD5iiMSX82m9pxJp0762Qc')
+    data_path = Path(__file__).parent
+    if not (data_path / 'data.zip').exists():
+        gdown.download(id='1S5l8Bn_oTckD5iiMSX82m9pxJp0762Qc')
     with zipfile.ZipFile('data.zip', 'r') as zip_ref:
         zip_ref.extractall('')
 
