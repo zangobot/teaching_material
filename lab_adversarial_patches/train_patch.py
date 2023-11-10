@@ -29,6 +29,7 @@ def main():
         zip_ref.extractall('')
 
     target_class = [args.target_class]
+    # optionally train patches for every class
     if target_class[0] is None:
         target_class = ['book','cellphone','mouse','pencilcase','ringbinder']
     for t_c in target_class:
