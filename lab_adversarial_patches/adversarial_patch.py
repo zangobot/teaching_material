@@ -79,29 +79,34 @@ class AdversarialPatch:
             batch = tqdm(train_loader) if verbose else train_loader
             for b_idx, (x, y) in enumerate(batch):
                 x = x.to(device)
-                # the for loop is required in order to apply a different random transformation of a patch to each sample
+                y = (tr.ones_like(y) * target_class).to(device)
+ 
+                # the for loop is required in order to apply a different random patch transformation to each sample
                 for i in range(len(x)):
                     x[i] = self.apply_patch(x[i])
-                x = self.apply_patch(x)
-                y = (tr.ones_like(y) * target_class).to(device)
+                # x = self.apply_patch(x)
 
-                # compute predictions, average loss, and backpropagate gradients
+                # compute predictions, average loss, and gradients
                 out = model(x)
                 loss = ce(out, y)
                 grad = tr.autograd.grad(loss, self.patch)[0]
 
                 with tr.no_grad():
-                    # no need to average the gradients beacause the loss is already averaged across the batch
+                    # no need to average the gradients because the loss is already averaged across the batch
                     #grad /= len(x)
 
+                    # adjust learning rate and lower-bound it
                     step = lr / ep
                     if step < 1e-4: step = 1e-4
+
+                    # update patch with gradient step
                     self.patch = self.patch - step * grad
                     #self.patch = self.patch - lr * grad
 
+                    # clip patch to be in the image range
                     self.patch = tr.clamp(self.patch, min=0, max=1)
                     
-                # the following line it's required because assignments within tr.no_grad() scope set requires_grad = False
+                # patch assignments within tr.no_grad() scope set its requires_grad = False
                 self.patch.requires_grad = True
                 
                 if verbose:

@@ -20,13 +20,17 @@ class TorchModelWrapper:
                  num_classes: int,
                  ):
         self.model_name = model_name
+
+        # download imagenet-classification pretrained weights
         try:
             self.model = PRETRAINED_MODELS[self.model_name](weights='IMAGENET1K_V1')
         except KeyError:
             raise ValueError(f'Model name {self.model_name} is not included yet')
         
+        # adapt final FC layer to the classification task at hand
         self.model.classifier[-1] = tr.nn.Linear(self.model.classifier[-1].in_features, num_classes)
 
+        # freeze feature extraction layers
         for param in self.model.features.parameters():
             param.requires_grad = False
         
@@ -41,8 +45,11 @@ class TorchModelWrapper:
                     device_idx: int = -1,
                     verbose: bool = False,
                     ):
+        # optionally move model to GPU
         trn_device = tr.device(f'cuda:{device_idx}' if tr.cuda.is_available() and device_idx != -1 else 'cpu')
         self.model = self.model.to(trn_device)
+        
+        # define loss function and optimizer
         loss_fn = tr.nn.CrossEntropyLoss(reduction='mean')
         optimizer = tr.optim.Adam(params=self.model.parameters(), lr=1e-3)
 
