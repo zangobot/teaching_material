@@ -1,0 +1,6 @@
+git+https://github.com/pralab/secml-torch
+foolbox
+tensorboard
+adv_lib
+scikit-learn
+matplotlib
